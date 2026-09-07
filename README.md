@@ -1,93 +1,241 @@
-# vinext-starter
+# DevLens — GitHub Profile & Portfolio Analyzer
 
-A clean full-stack starter running on [vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and Drizzle support.
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-JSX-F7DF1E?logo=javascript&logoColor=black)
+![GitHub API](https://img.shields.io/badge/API-GitHub_REST-181717?logo=github)
+![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare&logoColor=white)
 
-## Prerequisites
+DevLens is a responsive GitHub profile and portfolio analyzer. It analyzes public repositories, matches resume and job-description skills, calculates repository-quality scores, recommends suitable projects, and provides improvement suggestions.
 
-- Node.js `>=22.13.0`
-- Linux with `flock`, `curl`, and GNU `timeout`
+## Live Demo
 
-## Sites Lifecycle
+[Open DevLens Live](https://devlens-himanshu.palhimanshu0192.workers.dev)
 
-The Sites lifecycle CLI runs the locked dependency install before returning this checkout. Edit the source under `app/`, then checkpoint when a coherent milestone is ready to inspect or share. The remote Sites builder runs `npm run build` against the pushed commit. Do not repeat install or build as a normal pre-checkpoint step.
+## Project Screenshot
 
-This starter does not use `wrangler.jsonc`.
+![DevLens Dashboard](./devlens-dashboard.jpg)
 
-`install:ci` is intentionally a single, non-retrying `npm ci`. It refuses a concurrent install for the same project, consumes a matching image-seeded npm cache with `--prefer-offline` while retaining registry fallback for a missing cache object, otherwise downloads and verifies the complete vinext tarball recorded in `package-lock.json`, limits npm to one socket, and terminates a stalled install. `build` applies a short timeout. These helpers target Linux and use GNU `timeout`; they are not native macOS scripts.
+## Problem Statement
 
-Scripts that need writable project-scoped home, npm, XDG, and temporary paths use `scripts/sites-env.sh`. The `dev` and `start` scripts honor the caller's runtime environment and keep Wrangler logs inside the checkout. The generated `.sites-runtime/` directory is disposable and ignored by Git.
+Developers often list many skills on their resumes, but recruiters may not find enough evidence of those skills in their GitHub repositories.
 
-## Included Shape
+Manually checking repositories, README files, technologies, activity, and missing skills takes time. DevLens solves this problem by converting public GitHub data into understandable scores, skill matches, project recommendations, and improvement plans.
 
-- edit site code under `app/`
-- `app/chatgpt-auth.ts` provides optional dispatch-owned ChatGPT sign-in helpers
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/index.ts` reads the D1 binding from the Cloudflare Worker environment
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
+## Key Features
 
-## Workspace Auth Headers
+- Analyzes public GitHub profiles and repositories.
+- Generates an explainable portfolio score out of 100.
+- Matches resume skills with GitHub repository evidence.
+- Supports PDF, DOCX, TXT and Markdown resume files.
+- Matches job-description requirements with GitHub skills.
+- Detects matched, missing and unproven technical skills.
+- Recommends a suitable project according to the job description.
+- Provides project stack, screens, APIs, database model and build steps.
+- Generates individual repository-quality scores.
+- Analyzes public repository README files.
+- Creates a skill evidence map from repository signals.
+- Compares two GitHub profiles.
+- Shows profile and repository improvement suggestions.
+- Estimates how improvements can increase the portfolio score.
+- Supports repository search, filtering and sorting.
+- Provides dark and light themes.
+- Works on desktop, tablet and mobile devices.
+- Uses public GitHub data without requiring login.
 
-OpenAI workspace sites can read the current user's email from `oai-authenticated-user-email`.
+## Tech Stack
 
-SIWC-authenticated workspace sites may also receive `oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty `name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by `oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
+| Category | Technologies |
+| --- | --- |
+| Frontend | React.js, JavaScript and JSX |
+| Structure | Semantic HTML through JSX |
+| Styling | CSS3 and responsive layouts |
+| API | GitHub REST API |
+| Components | Reusable UI components |
+| Icons | Lucide React |
+| Resume Processing | PDF.js and Mammoth |
+| Build Tools | Vite and Vinext |
+| Deployment | Cloudflare Workers |
+| Version Control | Git and GitHub |
 
-Treat the full name as optional and fall back to email when it is absent:
+## How DevLens Works
 
-```tsx
-import { headers } from "next/headers";
+1. The user enters a public GitHub username.
+2. DevLens fetches profile and repository data from the GitHub REST API.
+3. It calculates profile and repository-quality signals.
+4. Repository languages, topics, names and descriptions are analyzed.
+5. The application creates a GitHub skill inventory.
+6. Resume or job-description skills are compared with repository evidence.
+7. Missing skills and portfolio gaps are identified.
+8. A suitable project and improvement roadmap are generated.
 
-export default async function Home() {
-  const requestHeaders = await headers();
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
+## Resume Evidence Matching
 
-  const displayName = fullName ?? email;
-  // ...
-}
+Users can upload or paste their resume content. DevLens compares detected resume skills with visible evidence available in public GitHub repositories.
+
+Supported resume formats:
+
+- PDF
+- DOCX
+- TXT
+- Markdown
+
+Maximum supported file size: **8 MB**
+
+Resume files are processed locally inside the browser and are not permanently uploaded or stored.
+
+## Job-Description Matching
+
+Users can paste a job description to receive:
+
+- Overall job match percentage
+- Matched skills
+- Missing skills
+- Skills without visible GitHub evidence
+- Suitable portfolio project recommendation
+- Recommended technology stack
+- Core application screens
+- REST API plan
+- Suggested database model
+- Step-by-step project-building plan
+- Resume-ready project outcome
+
+## Repository Quality Score
+
+Repository-quality scores use public metadata such as:
+
+- Repository description
+- Primary programming language
+- Repository topics
+- Recent activity
+- Homepage or live demo
+- Stars and forks
+- Issue support
+- Archived status
+
+These scores are project-based heuristics and are not official GitHub or hiring scores.
+
+## GitHub API Endpoints
+
+DevLens uses public GitHub REST API endpoints:
+
+```text
+GET https://api.github.com/users/{username}
+
+GET https://api.github.com/users/{username}/repos
+
+GET https://api.github.com/repos/{owner}/{repository}/readme
 ```
 
-## Optional Dispatch-Owned ChatGPT Sign-In
+No API key is required for normal public-profile analysis. GitHub can apply a request limit to unauthenticated API usage.
 
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs optional or required ChatGPT sign-in:
+## Getting Started
 
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send anonymous visitors through Sign in with ChatGPT.
-- In a Server Component, start sign-in with `<a href={chatGPTSignInPath(returnTo)} target="_top">`. The auth helper module is server-only; do not import it into a Client Component.
-- Do not use `fetch`, XHR, a client-side router, or a framework link that can prefetch the sign-in route. SIWC must start as a top-level navigation.
-- Never request the AuthAPI authorization endpoint directly. The dispatch-owned `/signin-with-chatgpt` route must start the SIWC flow.
-- Use `chatGPTSignOutPath(returnTo)` for browser sign-out links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because they depend on per-request identity headers.
+### Prerequisites
 
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the OAuth cookies, and identity header injection. Do not implement app routes for those reserved paths. Routes that do not import and call the helper remain anonymous-compatible.
+- Node.js 22 or later
+- npm
+- Git
 
-SIWC establishes identity only; it does not prove workspace membership. Use the Sites hosting platform's access policy controls for workspace-wide restrictions, or enforce explicit server-side membership or allowlist checks.
+### Installation
 
-Use SIWC for account pages, user-specific dashboards, saved records, and write actions tied to the current ChatGPT user. Leave public content anonymous.
+```bash
+git clone YOUR_GITHUB_REPOSITORY_URL
+cd DevLens
+npm install
+```
 
-## Diagnostic Commands
+### Run Locally
 
-- `npm run install:ci`: perform the one bounded lockfile install
-- `npm run dev`: start the Vite/Vinext development server
-- `npm run build`: build the deployable Sites artifact
-- `npm run start`: start the built Vinext application
-- `npm test`: build and verify the rendered development-preview metadata
-- `npm run db:generate`: generate Drizzle migrations after schema changes
+```bash
+npm run dev
+```
 
-Use build commands for targeted diagnosis after a remote failure, not as part of the normal checkpoint path.
+Open the local URL displayed in the terminal:
 
-The timeout defaults can be overridden for a controlled canary with `SITES_INSTALL_TIMEOUT`, `SITES_INSTALL_KILL_AFTER`, `SITES_BUILD_TIMEOUT`, and `SITES_BUILD_KILL_AFTER`. A timeout fails the command; the helpers never retry an unchanged install or build.
+```text
+http://localhost:5173
+```
 
-## Learn More
+You can use `octocat` as a sample GitHub username.
 
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+## Cloudflare Deployment
+
+Login to Cloudflare:
+
+```bash
+npx wrangler login
+```
+
+Check login:
+
+```bash
+npx wrangler whoami
+```
+
+Deploy the project:
+
+```bash
+npx @vinext/cloudflare deploy
+```
+
+Cloudflare will display the final `workers.dev` demo URL after successful deployment.
+
+## Project Structure
+
+```text
+DevLens/
+├── app/
+│   ├── devlens-client.jsx
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx
+├── components/
+│   └── ui/
+├── lib/
+│   └── utils.ts
+├── public/
+├── devlens-dashboard.jpg
+├── package.json
+├── vite.config.ts
+├── wrangler.jsonc
+└── README.md
+```
+
+## Project Roadmap
+
+| Phase | Development Work | Status |
+| --- | --- | --- |
+| Phase 1 | GitHub profile fetching and repository analysis | ✅ Completed |
+| Phase 2 | Portfolio score and language insights | ✅ Completed |
+| Phase 3 | Resume evidence matching and file processing | ✅ Completed |
+| Phase 4 | Job-description matching and project recommendation | ✅ Completed |
+| Phase 5 | Repository scoring and advanced README analyzer | ✅ Completed |
+| Phase 6 | Profile comparison and improvement roadmap | ✅ Completed |
+| Phase 7 | GitHub OAuth, backend proxy and saved reports | 🔜 Planned |
+| Phase 8 | AI README assistant and downloadable PDF reports | 💡 Future |
+
+## Next Development Priorities
+
+1. Add a secure backend proxy for GitHub API requests.
+2. Add GitHub OAuth for improved API request limits.
+3. Save previous profile and job-match reports.
+4. Export analysis results as a professional PDF.
+5. Add contribution and commit-quality insights.
+6. Compare multiple job descriptions.
+7. Add automated testing and GitHub Actions deployment.
+
+## Privacy
+
+- Only public GitHub profile and repository data is analyzed.
+- GitHub login is not required.
+- Resume files are processed locally in the browser.
+- Resume content is not permanently stored or uploaded.
+
+## Author
+
+**Himanshu Pal**  
+B.Tech CSE (AI) Student
+
+---
+
+If you find DevLens useful, consider giving the repository a star.
